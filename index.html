@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Astore-9 - Black Box Terminal</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-transform: uppercase;
+        }
+
+        .container {
+            width: 90%;
+            height: 90%;
+            border: 2px solid #0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .active {
+            display: flex;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            border-bottom: 1px solid #0f0;
+            padding-bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 80%;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+
+        .data-item {
+            margin: 10px 0;
+        }
+
+        input[type="password"] {
+            background-color: #000;
+            border: 1px solid #0f0;
+            color: #0f0;
+            font-family: inherit;
+            padding: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            width: 50%;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        button {
+            background-color: #0f0;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background-color: #fff;
+        }
+
+        #log-screen {
+            justify-content: flex-start;
+            overflow-y: hidden;
+        }
+
+        .log-content {
+            flex-grow: 1;
+            width: 100%;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            text-align: left;
+            padding-left: 10px;
+            box-sizing: border-box;
+        }
+
+        .log-red { color: #f00; }
+        .log-blue { color: #00f; }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            border: 1px solid #0f0;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #0f0;
+            width: 0%;
+        }
+
+        #end-code {
+            font-size: 2.5rem;
+            letter-spacing: 10px;
+            margin: 20px 0;
+            color: #fff;
+        }
+
+        #timer {
+            font-size: 1.2rem;
+            color: #ff0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Schermata di login / Scatola Nera -->
+        <div id="login-screen" class="screen active">
+            <h1>Astore-9 Terminal</h1>
+            <div class="data-grid">
+                <div class="data-item">SYS: ONLINE</div>
+                <div class="data-item">LOC: [LOCKED]</div>
+                <div class="data-item">ALT: 0.0M</div>
+                <div class="data-item">BAT: 85%</div>
+            </div>
+            <input type="password" id="password-input" placeholder="ENTER KEY">
+            <button onclick="checkPassword()">Access</button>
+        </div>
+
+        <!-- Schermata Log -->
+        <div id="log-screen" class="screen">
+            <h1>Data Download in Progress</h1>
+            <div id="log-text" class="log-content"></div>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Schermata Finale -->
+        <div id="final-screen" class="screen">
+            <h1>Download Complete</h1>
+            <div>Access Code:</div>
+            <div id="end-code"></div>
+            <div id="timer"></div>
+        </div>
+    </div>
+
+    <script>
+        const PASS1 = "alpha123"; // Imposta qui la prima password
+        const PASS2 = "beta456";  // Imposta qui la seconda password
+        
+        let selectedColor = "";
+        let logInterval;
+        let countdownInterval;
+
+        function checkPassword() {
+            const pass = document.getElementById('password-input').value;
+            if (pass === PASS1) {
+                selectedColor = "log-red";
+                startLog();
+            } else if (pass === PASS2) {
+                selectedColor = "log-blue";
+                startLog();
+            } else {
+                alert("Access Denied");
+            }
+        }
+
+        function startLog() {
+            document.getElementById('login-screen').classList.remove('active');
+            document.getElementById('log-screen').classList.add('active');
+            
+            const logText = document.getElementById('log-text');
+            logText.className = 'log-content ' + selectedColor;
+
+            let progress = 0;
+            const totalDuration = 15 * 60 * 1000; // 15 minuti in millisecondi
+            const updateInterval = 1000; // Aggiorna ogni secondo
+            const increment = (updateInterval / totalDuration) * 100;
+
+            let logs = [
+                "Initializing connection...",
+                "Bypassing encryption layers...",
+                "Accessing root directory...",
+                "Downloading core files...",
+                "Decrypting secure packets...",
+                "Verifying data integrity...",
+                "Syncing backup servers..."
+            ];
+
+            let logIndex = 0;
+
+            logInterval = setInterval(() => {
+                progress += increment;
+                document.getElementById('progress-fill').style.width = progress + '%';
+
+                if (Math.random() > 0.7) {
+                    logText.innerHTML += logs[logIndex % logs.length] + " OK<br>";
+                    logText.scrollTop = logText.scrollHeight;
+                    logIndex++;
+                }
+
+                if (progress >= 100) {
+                    clearInterval(logInterval);
+                    showFinalScreen();
+                }
+            }, updateInterval);
+        }
+
+        function showFinalScreen() {
+            document.getElementById('log-screen').classList.remove('active');
+            document.getElementById('final-screen').classList.add('active');
+
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            document.getElementById('end-code').innerText = code;
+
+            let timeLeft = 5 * 60; // 5 minuti in secondi
+            countdownInterval = setInterval(() => {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                document.getElementById('timer').innerText = `Reset in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                timeLeft--;
+
+                if (timeLeft < 0) {
+                    clearInterval(countdownInterval);
+                    resetPage();
+                }
+            }, 1000);
+        }
+
+        function resetPage() {
+            document.getElementById('final-screen').classList.remove('active');
+            document.getElementById('login-screen').classList.add('active');
+            document.getElementById('password-input').value = '';
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('log-text').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

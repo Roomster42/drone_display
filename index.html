@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Astore-9 - Black Box Terminal</title>
     <style>
-        /* Variabile per gestire il colore di tutta l'interfaccia */
         :root {
-            --theme-color: #0f0; /* Verde di default */
+            --theme-color: #0f0; 
             --bg-color: #000;
         }
 
         * {
-            box-sizing: border-box; /* Previene le scrollbar indesiderate */
+            box-sizing: border-box; 
         }
 
         body {
@@ -32,7 +31,7 @@
 
         .container {
             width: 90%;
-            max-width: 1200px; /* Limita l'eccessiva larghezza su tablet grandi */
+            max-width: 1200px; 
             height: 90%;
             border: 2px solid var(--theme-color);
             padding: 20px;
@@ -144,7 +143,6 @@
             line-height: 1.4;
         }
 
-        /* Contenitore barra e percentuale */
         .progress-wrapper {
             width: 100%;
             margin-top: 15px;
@@ -174,10 +172,11 @@
         }
 
         #end-code {
-            font-size: 2.5rem;
-            letter-spacing: 10px;
+            font-size: 1.8rem; /* Font rimpicciolito per far stare la coordinata */
+            letter-spacing: 3px; /* Spaziatura ridotta */
             margin: 20px 0;
             color: #fff;
+            text-align: center;
         }
 
         #timer {
@@ -215,7 +214,7 @@
 
         <div id="final-screen" class="screen">
             <h1>Download Complete</h1>
-            <div>Access Code:</div>
+            <div>Target Coordinates:</div>
             <div id="end-code"></div>
             <div id="timer"></div>
         </div>
@@ -230,6 +229,7 @@
         
         let mainInterval;
         let logActive = false;
+        let finalCoordinate = ""; // Variabile per salvare la coordinata finale
 
         // Frasi di log per il download
         const logPhrases = [
@@ -268,11 +268,13 @@
                 msgDiv.style.color = "var(--theme-color)";
                 msgDiv.innerText = "ACCESS GRANTED";
                 
-                // Cambia il colore dell'interfaccia in base alla password
+                // Cambia il colore dell'interfaccia e imposta la coordinata
                 if (pass === PASS1) {
                     document.documentElement.style.setProperty('--theme-color', '#ff0000'); // Rosso
+                    finalCoordinate = "32T 0611745 5055764";
                 } else {
                     document.documentElement.style.setProperty('--theme-color', '#00aaff'); // Blu hi-tech
+                    finalCoordinate = "32T 0610654 5054765";
                 }
 
                 // Disabilita l'input durante il passaggio di schermata
@@ -393,13 +395,8 @@
             document.getElementById('log-screen').classList.remove('active');
             document.getElementById('final-screen').classList.add('active');
 
-            // Genera codice alfanumerico casuale
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 6; i++) {
-                code += characters.charAt(Math.floor(Math.random() * characters.length));
-            }
-            document.getElementById('end-code').innerText = code;
+            // Stampa la coordinata corretta al posto del codice casuale
+            document.getElementById('end-code').innerText = finalCoordinate;
 
             // Timer di reset di 5 minuti
             let timeLeft = 5 * 60; 
@@ -433,6 +430,7 @@
             
             failedAttempts = 0;
             isLocked = false;
+            finalCoordinate = "";
         }
     </script>
 </body>

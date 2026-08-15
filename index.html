@@ -221,8 +221,8 @@
     </div>
 
     <script>
-        const PASS1 = "A7Z25B6C"; // Password per tema Rosso
-        const PASS2 = "B8J34F1H"; // Password per tema Blu
+        const PASS1 = "234051"; // Password per tema Rosso
+        const PASS2 = "224589"; // Password per tema Blu
 
         let failedAttempts = 0;
         let isLocked = false;
@@ -271,10 +271,10 @@
                 // Cambia il colore dell'interfaccia e imposta la coordinata
                 if (pass === PASS1) {
                     document.documentElement.style.setProperty('--theme-color', '#ff0000'); // Rosso
-                    finalCoordinate = "32T 0611745 5055764";
+                    finalCoordinate = "POSIZIONE HQ BLU: settore C-2";
                 } else {
                     document.documentElement.style.setProperty('--theme-color', '#00aaff'); // Blu hi-tech
-                    finalCoordinate = "32T 0610654 5054765";
+                    finalCoordinate = "POSIZIONE HQ ROSSO: settore G-6";
                 }
 
                 // Disabilita l'input durante il passaggio di schermata
@@ -333,8 +333,8 @@
             const logText = document.getElementById('log-text');
             logText.innerHTML = ""; // Pulisce i log
             
-            // Variabili per il progresso principale (15 minuti)
-            const totalDuration = 15 * 60 * 1000; 
+            // Variabili per il progresso principale (30 minuti)
+            const totalDuration = 30 * 60 * 1000; 
             const updateInterval = 1000; 
             const increment = (updateInterval / totalDuration) * 100;
             let mainProgress = 0;
@@ -388,7 +388,7 @@
                         setTimeout(generateDynamicLog, Math.floor(Math.random() * 200 + 50));
                     }
                 }
-            }, 50); // Aggiorna la % della riga ogni 50ms
+            }, 85); // Aggiorna la % della riga ogni 85ms
         }
 
         function showFinalScreen() {
@@ -398,8 +398,8 @@
             // Stampa la coordinata corretta al posto del codice casuale
             document.getElementById('end-code').innerText = finalCoordinate;
 
-            // Timer di reset di 5 minuti
-            let timeLeft = 5 * 60; 
+            // Timer di reset di 10 minuti
+            let timeLeft = 10 * 60; 
             let countdownInterval = setInterval(() => {
                 let minutes = Math.floor(timeLeft / 60);
                 let seconds = timeLeft % 60;

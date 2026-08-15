@@ -171,6 +171,13 @@
             text-align: right;
         }
 
+        .countdown-text {
+            min-width: 70px;
+            font-weight: bold;
+            text-align: left;
+            color: #fff;
+        }
+
         #end-code {
             font-size: 1.8rem; /* Font rimpicciolito per far stare la coordinata */
             letter-spacing: 3px; /* Spaziatura ridotta */
@@ -205,10 +212,11 @@
             <h1>Data Download in Progress</h1>
             <div id="log-text" class="log-content"></div>
             <div class="progress-wrapper">
+                <div id="progress-text" class="progress-text">0%</div>
                 <div class="progress-bar">
                     <div id="progress-fill" class="progress-fill"></div>
                 </div>
-                <div id="progress-text" class="progress-text">0%</div>
+                <div id="countdown-text" class="countdown-text">30:00</div>
             </div>
         </div>
 
@@ -254,7 +262,31 @@
             "Bypassing biometric lock",
             "Routing through proxy servers",
             "Extracting core protocols",
-            "Injecting surveillance scripts"
+            "Injecting surveillance scripts",
+            "Rebuilding corrupted sectors",
+            "Cross-referencing satellite uplink",
+            "Calibrating sensor array",
+            "Authenticating clearance level",
+            "Spoofing network signature",
+            "Reconstructing audio fragments",
+            "Indexing encrypted archives",
+            "Triangulating signal origin",
+            "Purging temporary cache",
+            "Validating checksum tables",
+            "Deploying countermeasure protocol",
+            "Rerouting power to core systems",
+            "Fetching diagnostic subroutines",
+            "Compressing telemetry stream",
+            "Unlocking hidden partition",
+            "Cloning secure volume",
+            "Analyzing thermal signatures",
+            "Synchronizing internal clock",
+            "Resolving DNS anomalies",
+            "Interfacing with legacy hardware",
+            "Neutralizing tracking beacon",
+            "Verifying digital signatures",
+            "Loading classified schematics",
+            "Assembling fragmented packets"
         ];
 
         function checkPassword() {
@@ -325,6 +357,13 @@
             }, 1000);
         }
 
+        function formatMMSS(totalSeconds) {
+            const s = Math.max(0, Math.round(totalSeconds));
+            const minutes = Math.floor(s / 60);
+            const seconds = s % 60;
+            return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
         function startLog() {
             document.getElementById('login-screen').classList.remove('active');
             document.getElementById('log-screen').classList.add('active');
@@ -338,14 +377,21 @@
             const updateInterval = 1000; 
             const increment = (updateInterval / totalDuration) * 100;
             let mainProgress = 0;
+            let remainingMs = totalDuration;
+
+            document.getElementById('countdown-text').innerText = formatMMSS(remainingMs / 1000);
 
             // Avvia la barra principale
             mainInterval = setInterval(() => {
                 mainProgress += increment;
                 if (mainProgress > 100) mainProgress = 100;
+
+                remainingMs -= updateInterval;
+                if (remainingMs < 0) remainingMs = 0;
                 
                 document.getElementById('progress-fill').style.width = mainProgress + '%';
                 document.getElementById('progress-text').innerText = Math.floor(mainProgress) + '%';
+                document.getElementById('countdown-text').innerText = formatMMSS(remainingMs / 1000);
 
                 if (mainProgress >= 100) {
                     clearInterval(mainInterval);
@@ -426,6 +472,7 @@
             
             document.getElementById('progress-fill').style.width = '0%';
             document.getElementById('progress-text').innerText = '0%';
+            document.getElementById('countdown-text').innerText = '30:00';
             document.getElementById('log-text').innerHTML = '';
             
             failedAttempts = 0;

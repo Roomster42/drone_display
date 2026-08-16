@@ -178,6 +178,76 @@
             color: var(--theme-color);
         }
 
+        /* Effetto testo sfumato in movimento */
+        .shimmer-text {
+            background: linear-gradient(
+                90deg,
+                var(--theme-color) 0%,
+                #fff 50%,
+                var(--theme-color) 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+
+        /* Overlay per la simulazione di perdita di segnale */
+        #glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0;
+            mix-blend-mode: screen;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(255, 0, 0, 0.15) 0px,
+                rgba(0, 170, 255, 0.15) 2px,
+                transparent 2px,
+                transparent 4px
+            );
+        }
+
+        /* Effetto glitch a schermo intero, simula perdita di segnale video */
+        body.signal-glitch #glitch-overlay {
+            opacity: 1;
+            animation: overlay-flicker 0.35s steps(2, end);
+        }
+
+        body.signal-glitch .container {
+            animation: container-glitch 0.35s steps(2, end);
+        }
+
+        @keyframes container-glitch {
+            0%   { transform: translate(0); filter: none; }
+            10%  { transform: translate(-10px, 4px) skewX(2deg); filter: hue-rotate(90deg) saturate(3); }
+            20%  { transform: translate(10px, -4px) skewX(-2deg); filter: hue-rotate(-90deg) contrast(1.5); }
+            30%  { transform: translate(-8px, 0); filter: contrast(2.5) brightness(1.3); opacity: 0.7; }
+            40%  { transform: translate(8px, 5px); filter: none; opacity: 1; }
+            50%  { transform: translate(-6px, -5px) skewX(3deg); filter: hue-rotate(60deg); }
+            60%  { transform: translate(6px, 0); opacity: 0.4; }
+            70%  { transform: translate(-4px, 3px); filter: invert(0.25); }
+            80%  { transform: translate(4px, -3px); }
+            90%  { transform: translate(-2px, 1px); }
+            100% { transform: translate(0); filter: none; opacity: 1; }
+        }
+
+        @keyframes overlay-flicker {
+            0%, 100% { opacity: 0; }
+            10%, 30%, 50%, 70%, 90% { opacity: 0.9; }
+            20%, 40%, 60%, 80% { opacity: 0.2; }
+        }
+
         #end-code {
             font-size: 1.8rem; /* Font rimpicciolito per far stare la coordinata */
             letter-spacing: 3px; /* Spaziatura ridotta */
@@ -190,13 +260,75 @@
             font-size: 1.2rem;
             color: #fff;
         }
+
+        /* Safety net: se il contenuto supera l'altezza disponibile, scrolla invece di tagliare */
+        .screen {
+            overflow-y: auto;
+        }
+
+        /* Tablet e schermi medi */
+        @media (max-width: 900px) {
+            #end-code {
+                font-size: 1.4rem;
+                letter-spacing: 2px;
+            }
+        }
+
+        /* Smartphone in verticale */
+        @media (max-width: 480px) {
+            input[type="password"] {
+                width: 80%;
+                font-size: 1rem;
+            }
+            #end-code {
+                font-size: 1.1rem;
+                letter-spacing: 1px;
+                word-break: break-word;
+            }
+            .data-grid {
+                width: 95%;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Schermi molto bassi: smartphone in orizzontale */
+        @media (max-height: 420px) {
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                margin-bottom: 8px;
+                padding-bottom: 6px;
+            }
+            .data-grid {
+                margin-bottom: 10px;
+            }
+            #login-message {
+                height: auto;
+                margin-bottom: 8px;
+            }
+            input[type="password"] {
+                padding: 6px;
+                margin-bottom: 10px;
+                font-size: 1rem;
+            }
+            button {
+                padding: 6px 16px;
+            }
+            #end-code {
+                font-size: 1.1rem;
+                margin: 10px 0;
+            }
+        }
     </style>
 </head>
 <body>
 
+    <div id="glitch-overlay"></div>
+
     <div class="container">
         <div id="login-screen" class="screen active">
-            <h1>Astore-9 Terminal</h1>
+            <h1 class="shimmer-text">Astore-9 Terminal</h1>
             <div class="data-grid">
                 <div class="data-item">SYS: ONLINE</div>
                 <div class="data-item">LOC: [LOCKED]</div>
@@ -209,7 +341,7 @@
         </div>
 
         <div id="log-screen" class="screen">
-            <h1>Data Download in Progress</h1>
+            <h1 class="shimmer-text">Data Download in Progress</h1>
             <div id="log-text" class="log-content"></div>
             <div class="progress-wrapper">
                 <div id="progress-text" class="progress-text">0%</div>
@@ -221,9 +353,9 @@
         </div>
 
         <div id="final-screen" class="screen">
-            <h1>Download Complete</h1>
+            <h1 class="shimmer-text">Download Complete</h1>
             <div>Target Coordinates:</div>
-            <div id="end-code"></div>
+            <div id="end-code" class="shimmer-text"></div>
             <div id="timer"></div>
         </div>
     </div>
@@ -479,6 +611,27 @@
             isLocked = false;
             finalCoordinate = "";
         }
+
+        function triggerSignalGlitch() {
+            document.body.classList.remove('signal-glitch');
+            void document.body.offsetWidth; // forza il reflow per poter ripetere l'animazione
+            document.body.classList.add('signal-glitch');
+
+            const glitchDuration = 250 + Math.random() * 300; // 250-550ms
+            setTimeout(() => {
+                document.body.classList.remove('signal-glitch');
+            }, glitchDuration);
+        }
+
+        function scheduleNextGlitch() {
+            const delay = 3000 + Math.random() * 6000; // intervallo casuale tra 3 e 9 secondi
+            setTimeout(() => {
+                triggerSignalGlitch();
+                scheduleNextGlitch();
+            }, delay);
+        }
+
+        scheduleNextGlitch(); // avvia il ciclo di glitch a timing casuale su tutta la pagina
     </script>
 </body>
 </html>
